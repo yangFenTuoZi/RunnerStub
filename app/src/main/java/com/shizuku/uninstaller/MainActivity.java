@@ -7,7 +7,6 @@ import android.app.AlertDialog;
 import android.app.Service;
 import android.app.UiModeManager;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -25,7 +24,6 @@ import android.view.animation.TranslateAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -79,12 +77,9 @@ public class MainActivity extends Activity {
         iv = findViewById(R.id.iv);
 
         //设置猫猫图案的长按事件为展示帮助界面
-        iv.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                showHelp();
-                return false;
-            }
+        iv.setOnLongClickListener(view -> {
+            showHelp();
+            return false;
         });
 
         //shizuku返回授权结果时将执行RL函数
@@ -111,37 +106,28 @@ public class MainActivity extends Activity {
                 .setTitle("使用帮助")
                 .setView(v)
                 .setNegativeButton("OK", null)
-                .setNeutralButton("设置", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
-                        dialog.getWindow().getAttributes().alpha = 0.85f;
-                        dialog.getWindow().setGravity(Gravity.BOTTOM);
+                .setNeutralButton("设置", (dialogInterface, i) -> {
+                    final AlertDialog dialog = new AlertDialog.Builder(MainActivity.this).create();
+                    dialog.getWindow().getAttributes().alpha = 0.85f;
+                    dialog.getWindow().setGravity(Gravity.BOTTOM);
 
-                        View v = View.inflate(MainActivity.this, R.layout.set, null);
-                        Switch S = v.findViewById(R.id.s);
+                    View v1 = View.inflate(MainActivity.this, R.layout.set, null);
+                    Switch S = v1.findViewById(R.id.s);
 
-                        S.setChecked(sp.getBoolean("hide", true));
-                        S.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                                sp.edit().putBoolean("hide", b).apply();
-                                ((ActivityManager) getSystemService(Service.ACTIVITY_SERVICE)).getAppTasks().get(0).setExcludeFromRecents(b);
-                            }
-                        });
-                        Switch S1 = v.findViewById(R.id.s1);
+                    S.setChecked(sp.getBoolean("hide", true));
+                    S.setOnCheckedChangeListener((compoundButton, b) -> {
+                        sp.edit().putBoolean("hide", b).apply();
+                        ((ActivityManager) getSystemService(Service.ACTIVITY_SERVICE)).getAppTasks().get(0).setExcludeFromRecents(b);
+                    });
+                    Switch S1 = v1.findViewById(R.id.s1);
 
-                        S1.setChecked(sp.getBoolean("20", false));
-                        S1.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                            @Override
-                            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                                sp.edit().putBoolean("20", b).apply();
-                                Toast.makeText(MainActivity.this, "重启APP后生效", Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                        dialog.setView(v);
-                        dialog.show();
-                    }
+                    S1.setChecked(sp.getBoolean("20", false));
+                    S1.setOnCheckedChangeListener((compoundButton, b) -> {
+                        sp.edit().putBoolean("20", b).apply();
+                        Toast.makeText(MainActivity.this, "重启APP后生效", Toast.LENGTH_SHORT).show();
+                    });
+                    dialog.setView(v1);
+                    dialog.show();
                 })
                 .create().show();
 
@@ -200,46 +186,27 @@ public class MainActivity extends Activity {
         e1 = findViewById(R.id.e);
         e1.setEnabled(true);
         e1.requestFocus();
-        e1.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(e1, 0);
+        e1.postDelayed(() -> ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE)).showSoftInput(e1, 0), 200);
+        e1.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                exe(v);
             }
-        }, 200);
-        e1.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    exe(v);
-                }
-                return false;
-            }
+            return false;
         });
-        e1.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN)
-                    exe(view);
-                return false;
-            }
+        e1.setOnKeyListener((view2, i, keyEvent) -> {
+            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN)
+                exe(view2);
+            return false;
         });
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                flipAnimation(view);
-                d.setVisibility(View.VISIBLE);
-                e.setVisibility(View.VISIBLE);
-                e1.setEnabled(false);
-                initlist();
-                findViewById(R.id.l1).setVisibility(View.GONE);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        ex(view);
-                    }
-                });
-            }
+        view.setOnClickListener(view3 -> {
+            flipAnimation(view3);
+            d.setVisibility(View.VISIBLE);
+            e.setVisibility(View.VISIBLE);
+            e1.setEnabled(false);
+            initlist();
+            findViewById(R.id.l1).setVisibility(View.GONE);
+            view3.setOnClickListener(this::ex);
         });
     }
 

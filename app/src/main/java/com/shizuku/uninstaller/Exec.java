@@ -66,13 +66,10 @@ public class Exec extends Activity {
         t1 = findViewById(R.id.t1);
         t2 = findViewById(R.id.t2);
         t2.requestFocus();
-        t2.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN)
-                    finish();
-                return false;
-            }
+        t2.setOnKeyListener((view, i, keyEvent) -> {
+            if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN)
+                finish();
+            return false;
         });
         //子线程执行命令，否则UI线程执行就会导致UI卡住动不了
         h1 = new Thread(new Runnable() {
@@ -98,53 +95,47 @@ public class Exec extends Activity {
             out.close();
 
             //开启新线程，实时读取命令输出
-            h2 = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                        String inline;
-                        while ((inline = mReader.readLine()) != null) {
+            h2 = new Thread(() -> {
+                try {
+                    BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                    String inline;
+                    while ((inline = mReader.readLine()) != null) {
 
-                            //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
-                            if (t2.length() > 2000 || br) break;
-                            Message msg = new Message();
-                            msg.what = 0;
-                            msg.obj = inline.equals("") ? "\n" : inline + "\n";
-                            mHandler.sendMessage(msg);
-                        }
-                        mReader.close();
-                    } catch (Exception ignored) {
+                        //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
+                        if (t2.length() > 2000 || br) break;
+                        Message msg = new Message();
+                        msg.what = 0;
+                        msg.obj = inline.equals("") ? "\n" : inline + "\n";
+                        mHandler.sendMessage(msg);
                     }
+                    mReader.close();
+                } catch (Exception ignored) {
                 }
             });
             h2.start();
 
             //开启新线程，实时读取命令报错信息
-            h3 = new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    try {
-                        BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                        String inline;
-                        while ((inline = mReader.readLine()) != null) {
+            h3 = new Thread(() -> {
+                try {
+                    BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                    String inline;
+                    while ((inline = mReader.readLine()) != null) {
 
-                            //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
-                            if (t2.length() > 2000 || br) break;
-                            Message msg = new Message();
-                            msg.what = 1;
-                            if (inline.equals(""))
-                                msg.obj = null;
-                            else {
-                                SpannableString ss = new SpannableString(inline + "\n");
-                                ss.setSpan(new ForegroundColorSpan(Color.RED), 0, ss.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                                msg.obj = ss;
-                            }
-                            mHandler.sendMessage(msg);
+                        //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
+                        if (t2.length() > 2000 || br) break;
+                        Message msg = new Message();
+                        msg.what = 1;
+                        if (inline.equals(""))
+                            msg.obj = null;
+                        else {
+                            SpannableString ss = new SpannableString(inline + "\n");
+                            ss.setSpan(new ForegroundColorSpan(Color.RED), 0, ss.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                            msg.obj = ss;
                         }
-                        mReader.close();
-                    } catch (Exception ignored) {
+                        mHandler.sendMessage(msg);
                     }
+                    mReader.close();
+                } catch (Exception ignored) {
                 }
             });
             h3.start();
@@ -173,20 +164,17 @@ public class Exec extends Activity {
         //关闭所有输入输出流，销毁进程，防止内存泄漏等问题
         br = true;
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    if (Build.VERSION.SDK_INT >= 26) {
-                        p.destroyForcibly();
-                    } else {
-                        p.destroy();
-                    }
-                    h1.interrupt();
-                    h2.interrupt();
-                    h3.interrupt();
-                } catch (Exception ignored) {
+        new Handler().postDelayed(() -> {
+            try {
+                if (Build.VERSION.SDK_INT >= 26) {
+                    p.destroyForcibly();
+                } else {
+                    p.destroy();
                 }
+                h1.interrupt();
+                h2.interrupt();
+                h3.interrupt();
+            } catch (Exception ignored) {
             }
         }, 1000);
         super.onDestroy();
