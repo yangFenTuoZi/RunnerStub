@@ -11,6 +11,7 @@ import android.os.Message;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.TextView;
@@ -19,8 +20,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
 
 import rikka.shizuku.Shizuku;
+import rikka.shizuku.ShizukuRemoteProcess;
 
 public class Exec extends Activity {
 
@@ -44,7 +47,7 @@ public class Exec extends Activity {
         public void handleMessage(Message msg) {
 
             //msg.what 是1就是错误信息，是2是正常信息
-            mOuter.get().t2.append(msg.what == 1 ? (SpannableString)msg.obj : String.valueOf(msg.obj));
+            mOuter.get().t2.append(msg.what == 1 ? (SpannableString) msg.obj : String.valueOf(msg.obj));
         }
     }
 
@@ -62,11 +65,11 @@ public class Exec extends Activity {
         setContentView(R.layout.exec);
         t1 = findViewById(R.id.t1);
         t2 = findViewById(R.id.t2);
-t2.requestFocus();
+        t2.requestFocus();
         t2.setOnKeyListener(new View.OnKeyListener() {
             @Override
             public boolean onKey(View view, int i, KeyEvent keyEvent) {
-                if (keyEvent.getKeyCode()==KeyEvent.KEYCODE_ENTER&&keyEvent.getAction()==KeyEvent.ACTION_DOWN)
+                if (keyEvent.getKeyCode() == KeyEvent.KEYCODE_ENTER && keyEvent.getAction() == KeyEvent.ACTION_DOWN)
                     finish();
                 return false;
             }
@@ -88,7 +91,7 @@ t2.requestFocus();
             long time = System.currentTimeMillis();
 
             //使用Shizuku执行命令
-            p = Shizuku.newProcess(new String[]{"sh"}, null, null);
+            p = newProcess(new String[]{"sh"});
             OutputStream out = p.getOutputStream();
             out.write((cmd + "\nexit\n").getBytes());
             out.flush();
@@ -133,7 +136,7 @@ t2.requestFocus();
                             if (inline.equals(""))
                                 msg.obj = null;
                             else {
-                                SpannableString ss = new SpannableString(inline+"\n");
+                                SpannableString ss = new SpannableString(inline + "\n");
                                 ss.setSpan(new ForegroundColorSpan(Color.RED), 0, ss.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 msg.obj = ss;
                             }
@@ -189,5 +192,14 @@ t2.requestFocus();
         super.onDestroy();
     }
 
-
+    private static ShizukuRemoteProcess newProcess(String[] cmd) {
+        try {
+            Method newProcess = Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
+            newProcess.setAccessible(true);
+            return (ShizukuRemoteProcess) newProcess.invoke(null, cmd, null, null);
+        } catch (Exception e) {
+            Log.e("Exec", "Error creating new process", e);
+            return null;
+        }
+    }
 }

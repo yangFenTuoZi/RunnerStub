@@ -3,24 +3,15 @@ plugins {
 }
 
 android {
-    signingConfigs {
-        release {
-            storeFile file('D:\\ginkgo\\文件备份\\key.keystore')
-            storePassword 'wewewe'
-            keyPassword 'wewewe'
-            keyAlias 'key0'
-        }
-    }
-    compileSdk 32
+    compileSdk 35
 
+    namespace "com.shizuku.uninstaller"
     defaultConfig {
         applicationId "com.shizuku.uninstaller"
-        minSdk 23
-        targetSdk 32
+        minSdk 24
+        targetSdk 35
         versionCode 13
         versionName "13"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
@@ -30,12 +21,12 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
     }
 }
 
 dependencies {
-    implementation "dev.rikka.shizuku:api:12.2.0"
-    implementation "dev.rikka.shizuku:provider:12.2.0"
+    implementation "dev.rikka.shizuku:api:13.1.5"
+    implementation "dev.rikka.shizuku:provider:13.1.5"
 }
