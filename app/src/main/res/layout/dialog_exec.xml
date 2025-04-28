@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/t1"
+            style="@style/text.title"
+            android:gravity="center" />
+
+        <TextView
+            android:id="@+id/t2"
+            style="@style/text"
+            android:layout_marginHorizontal="40dp"
+            android:textColor="#00aa00"
+            android:textIsSelectable="true" />
+    </LinearLayout>
+
+</ScrollView>

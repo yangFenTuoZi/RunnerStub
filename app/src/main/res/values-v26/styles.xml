@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="t.2">
+    <style name="text.summary">
         <item name="android:autoSizeMaxTextSize">15sp</item>
         <item name="android:autoSizeMinTextSize">11sp</item>
         <item name="android:autoSizeTextType">uniform</item>

@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <style name="t.1">
+    <style name="text.title">
         <item name="android:textColor">@android:color/system_accent1_500</item>
     </style>
 
-    <style name="t.2">
+    <style name="text.summary">
         <item name="android:textColor">@android:color/system_neutral2_700</item>
         <item name="android:autoSizeMaxTextSize">15sp</item>
         <item name="android:autoSizeMinTextSize">11sp</item>
@@ -13,7 +12,7 @@
         <item name="android:autoSizeStepGranularity">1sp</item>
     </style>
 
-    <style name="l">
+    <style name="main_linearlayout">
         <item name="android:background">@android:color/system_neutral2_10</item>
     </style>
 </resources>

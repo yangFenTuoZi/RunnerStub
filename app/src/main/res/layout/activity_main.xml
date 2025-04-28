@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/l"
+    style="@style/main_linearlayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -12,19 +12,17 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/b"
-            style="@style/s"
-            android:onClick="ch" />
+            android:id="@+id/shizuku_status"
+            style="@style/s" />
 
         <ImageView
-            android:id="@+id/iv"
+            android:id="@+id/logo"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@string/cat"
-            android:onClick="ex" />
+            android:background="@string/cat" />
 
         <Button
-            android:id="@+id/c"
+            android:id="@+id/shizuku_permission"
             style="@style/s" />
 
     </LinearLayout>
@@ -35,20 +33,20 @@
         android:orientation="vertical">
 
         <LinearLayout
-            android:id="@+id/l"
+            android:id="@+id/list_root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
             <ListView
-                android:id="@+id/list"
+                android:id="@+id/list_left"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
 
             <ListView
-                android:id="@+id/lista"
+                android:id="@+id/list_right"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
@@ -57,7 +55,7 @@
         </LinearLayout>
 
         <LinearLayout
-            android:id="@+id/l1"
+            android:id="@+id/exec_command_root"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -65,22 +63,22 @@
             android:visibility="gone">
 
             <EditText
-                android:id="@+id/e"
+                android:id="@+id/commandEdit"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
                 android:background="@null"
-                android:imeOptions="actionDone"
                 android:hint="输入要执行的命令"
+                android:imeOptions="actionDone"
                 android:singleLine="true" />
 
             <ImageButton
+                android:id="@+id/exec"
                 style="@android:style/Widget.Material.Button.Borderless.Colored"
                 android:layout_width="56dp"
                 android:layout_height="56dp"
                 android:layout_gravity="center"
-                android:onClick="exe"
                 android:src="@drawable/run" />
         </LinearLayout>
 
