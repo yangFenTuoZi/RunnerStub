@@ -3,20 +3,29 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
 
-    namespace "com.shizuku.uninstaller"
+    namespace "runner.stub"
     defaultConfig {
-        applicationId "com.shizuku.uninstaller"
+        applicationId "runner.stub"
         minSdk 24
-        targetSdk 35
-        versionCode 13
-        versionName "13"
+        targetSdk 36
+        versionCode 1
+        versionName "1"
+        ndk {
+            abiFilters "x86", "x86_64", "armeabi-v7a", "arm64-v8a"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
     }
 
     buildTypes {
         release {
             minifyEnabled false
+            shrinkResources false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
@@ -28,9 +37,16 @@ android {
     buildFeatures {
         viewBinding true
     }
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
 }
 
 dependencies {
     implementation "dev.rikka.shizuku:api:13.1.5"
     implementation "dev.rikka.shizuku:provider:13.1.5"
+    implementation 'androidx.core:core:1.12.0'
 }

@@ -10,12 +10,15 @@
 
         <TextView
             android:id="@+id/t1"
-            style="@style/text.title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/holo_blue_dark"
             android:gravity="center" />
 
         <TextView
             android:id="@+id/t2"
-            style="@style/text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginHorizontal="40dp"
             android:textColor="#00aa00"
             android:textIsSelectable="true" />

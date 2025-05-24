@@ -1,4 +1,4 @@
-package com.shizuku.uninstaller;
+package runnerstub;
 
 import android.app.Activity;
 import android.app.Service;
@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -23,12 +22,13 @@ import java.util.Locale;
 
 import rikka.shizuku.Shizuku;
 import rikka.shizuku.ShizukuRemoteProcess;
+import runner.stub.R;
 
 public class ExecActivity extends Activity {
 
     TextView t1, t2;
     Process p;
-    Thread h1, h2, h3;
+    Thread h1;
     boolean br = false;
 
     @Override
@@ -66,7 +66,7 @@ public class ExecActivity extends Activity {
             p = newProcess(new String[]{"sh"});
             if (p == null) {
                 runOnUiThread(() -> {
-                    t1.setText("Shizuku进程创建失败");
+                    t1.setText("Shizuku 进程创建失败");
                     setTitle("执行失败");
                 });
                 return;
@@ -76,46 +76,23 @@ public class ExecActivity extends Activity {
             out.flush();
             out.close();
 
-            //开启新线程，实时读取命令输出
-            h2 = new Thread(() -> {
-                try {
-                    BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                    String inline;
-                    while ((inline = mReader.readLine()) != null) {
-
-                        //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
-                        if (t2.length() > 2000 || br) break;
-                        String finalInline = inline;
-                        runOnUiThread(() -> {
-                            t2.append(finalInline);
-                            t2.append("\n");
-                        });
-                    }
-                    mReader.close();
-                } catch (Exception ignored) {
+            //实时读取命令输出
+            try {
+                BufferedReader inputReader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                String inline;
+                while ((inline = inputReader.readLine()) != null || (inline = errorReader.readLine()) != null) {
+                    //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
+                    if (t2.length() > 2000 || br) break;
+                    String finalInline = inline;
+                    runOnUiThread(() -> {
+                        t2.append(finalInline);
+                        t2.append("\n");
+                    });
                 }
-            });
-            h2.start();
-
-            //开启新线程，实时读取命令报错信息
-            h3 = new Thread(() -> {
-                try {
-                    BufferedReader mReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                    String inline;
-                    while ((inline = mReader.readLine()) != null) {
-
-                        //如果TextView的字符太多了（会使得软件非常卡顿），或者用户退出了执行界面（br为true），则停止读取
-                        if (t2.length() > 2000 || br) break;
-                        SpannableString ss = new SpannableString(inline + "\n");
-                        ss.setSpan(new ForegroundColorSpan(Color.RED), 0, ss.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        runOnUiThread(() -> t2.append(ss));
-
-                    }
-                    mReader.close();
-                } catch (Exception ignored) {
-                }
-            });
-            h3.start();
+                inputReader.close();
+            } catch (Exception ignored) {
+            }
 
             //等待命令运行完毕
             p.waitFor();
@@ -140,21 +117,15 @@ public class ExecActivity extends Activity {
 
         new Handler().postDelayed(() -> {
             try {
-                if (Build.VERSION.SDK_INT >= 26) {
-                    p.destroyForcibly();
-                } else {
-                    p.destroy();
-                }
+                p.destroy();
                 h1.interrupt();
-                h2.interrupt();
-                h3.interrupt();
             } catch (Exception ignored) {
             }
         }, 1000);
         super.onDestroy();
     }
 
-    private static ShizukuRemoteProcess newProcess(String[] cmd) {
+    public static ShizukuRemoteProcess newProcess(String[] cmd) {
         try {
             Method newProcess = Shizuku.class.getDeclaredMethod("newProcess", String[].class, String[].class, String.class);
             newProcess.setAccessible(true);

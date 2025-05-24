@@ -5,5 +5,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "uninstaller"
+rootProject.name = "runner-stub"
 include ':app'

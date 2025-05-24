@@ -1,0 +1,3 @@
+command=env&&sleep 1
+reduce_perm=
+target_perm=
